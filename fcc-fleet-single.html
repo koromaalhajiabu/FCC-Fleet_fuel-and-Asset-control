@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1f3a">
+<meta name="description" content="Offline-first municipal fleet, fuel, maintenance, assets and stores control system.">
+<title>FCC Fleet, Fuel & Asset Control</title>
+<style>
+:root{--navy:#0b1f3a;--navy2:#17395f;--gold:#e4b84f;--bg:#f3f6fa;--ink:#182435;--muted:#66758a;--line:#dfe6ef}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;background:var(--navy);color:#fff;font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.secondary{background:#e8edf4;color:var(--navy)}
+button.gold{background:var(--gold);color:#182435}
+button.danger{background:#a92d35}
+button.small{padding:6px 9px;font-size:12px}
+.hidden{display:none!important}
+header{background:linear-gradient(115deg,var(--navy),var(--navy2));color:#fff;padding:15px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:4px solid var(--gold)}
+.brand{display:flex;align-items:center;gap:12px}
+.crest{height:44px;width:44px;border:2px solid var(--gold);border-radius:12px;display:grid;place-items:center;font-weight:900;color:var(--gold)}
+h1{font-size:18px;margin:0}
+header p{margin:3px 0 0;color:#d8e1ed;font-size:12px}
+.head-right{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.head-right .pill{background:#ffffff22;color:#fff}
+.wrap{max-width:1450px;margin:auto;padding:16px}
+.notice{background:#fff8df;border:1px solid #f0d78e;border-radius:12px;padding:11px 13px;margin-bottom:14px;color:#5d4a14;font-size:13px}
+.login{max-width:430px;margin:6vh auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:23px;box-shadow:0 10px 35px #10213a12}
+.login h2{margin-top:0}
+.field{display:grid;gap:5px;margin:10px 0;min-width:0}
+.field label{font-size:12px;font-weight:750;color:#536277}
+.field input,.field select,.field textarea{width:100%;padding:10px;border:1px solid #cfd8e4;border-radius:9px;background:#fff;color:var(--ink);min-width:0}
+.field textarea{min-height:70px;resize:vertical}
+.field.wide{grid-column:1/-1}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.appgrid{display:grid;grid-template-columns:218px minmax(0,1fr);gap:16px}
+.side{background:var(--navy);border-radius:16px;padding:10px;height:max-content;position:sticky;top:8px}
+.navbtn{display:block;width:100%;text-align:left;background:transparent;color:#dbe5f1;margin:3px 0;padding:10px;border-radius:9px;font-weight:650}
+.navbtn.active,.navbtn:hover{background:#24496f;color:#fff}
+.navbtn.active{box-shadow:inset 3px 0 var(--gold)}
+.content{min-width:0}
+.pagehead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.pagehead h2{margin:0;font-size:22px}
+.muted{color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:14px}
+.stat,.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat .label{color:var(--muted);font-size:12px;font-weight:750}
+.stat .num{font-size:26px;font-weight:850;margin-top:4px}
+.stat .sub{font-size:11px;color:var(--muted)}
+.panel{margin-bottom:14px}
+.panel h3{margin:0 0 12px;font-size:16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.toolbar input,.toolbar select{padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff;min-width:140px;max-width:100%}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:680px;background:#fff}
+th,td{padding:10px 11px;text-align:left;border-bottom:1px solid #edf0f5;font-size:12px;vertical-align:top}
+th{background:#f5f7fa;color:#59697d;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;font-size:10px;font-weight:800;background:#e8edf4;color:#35465d}
+.pill.good{background:#dff5e9;color:#176a45}
+.pill.warn{background:#fff0cf;color:#8b5b00}
+.pill.bad{background:#ffe3e3;color:#a22e2e}
+.pill.info{background:#e3edff;color:#244c8c}
+.empty{text-align:center;color:var(--muted);padding:24px}
+.alert-line{margin:8px 0;font-size:13px}
+.bar-row{margin:12px 0}
+.bar-track{height:8px;background:#e9eef5;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:var(--navy);border-radius:99px}
+.footer{text-align:center;color:#778397;font-size:12px;padding:18px}
+.modalback{position:fixed;inset:0;background:#07172bb3;display:grid;place-items:center;padding:12px;z-index:10}
+.modal{background:#fff;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:16px;padding:18px}
+.modalhead{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.modalhead h3{margin:0}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#142b45;color:#fff;padding:12px 16px;border-radius:12px;z-index:20;box-shadow:0 8px 30px #0003;max-width:92vw}
+.syncdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e4b84f;margin-right:5px}
+.syncdot.online{background:#53d49b}
+.syncdot.offline{background:#ffb34d}
+.helpbox{padding:11px;background:#f2f6fb;border-radius:10px;font-size:12px;color:#536277;margin-bottom:10px}
+@media(max-width:850px){
+  .appgrid{grid-template-columns:1fr}
+  .side{position:static;display:flex;overflow:auto;gap:4px}
+  .navbtn{white-space:nowrap;width:auto;margin:0;padding:9px 10px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two{grid-template-columns:1fr}
+  .wrap{padding:10px}
+  .stat .num{font-size:22px}
+  .head-right button{padding:8px 10px}
+}
+@media print{
+  header,.side,.toolbar,button,.notice,.footer,.actions{display:none!important}
+  .appgrid{display:block}
+  .wrap{padding:0}
+  .panel,.stat{break-inside:avoid}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="crest">FCC</div>
+    <div>
+      <h1>Fleet, Fuel &amp; Asset Control</h1>
+      <p>Municipal Operations · Offline-first system</p>
+    </div>
+  </div>
+  <div class="head-right">
+    <span id="connectionBadge" class="pill"><span class="syncdot"></span>Checking connection</span>
+    <span class="pill info">Local storage</span>
+    <button class="secondary" data-action="print">Print / PDF</button>
+    <button id="logoutBtn" class="secondary hidden" data-action="logout">Sign out</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="notice">
+    <b>Data is stored on this device only.</b> Export a backup regularly (Sync &amp; Setup page). Cloud synchronisation between devices is not yet configured. The sign-in below is a local demonstration login, not production authentication.
+  </div>
+
+  <section id="loginView" class="login">
+    <h2>Staff sign in</h2>
+    <form id="loginForm" autocomplete="on">
+      <div class="field">
+        <label for="loginUser">Username</label>
+        <input id="loginUser" name="username" value="admin" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="loginPin">PIN</label>
+        <input id="loginPin" name="pin" type="password" value="1234" inputmode="numeric" autocomplete="current-password" required>
+      </div>
+      <button type="submit" style="width:100%">Open system</button>
+    </form>
+    <p class="muted">Local demo login: <b>admin / 1234</b>. Change this before real use.</p>
+  </section>
+
+  <section id="appView" class="hidden">
+    <div class="appgrid">
+      <nav class="side" id="nav" aria-label="Main navigation"></nav>
+      <main class="content">
+        <div class="pagehead">
+          <div>
+            <h2 id="pageTitle">Dashboard</h2>
+            <div id="pageSub" class="muted">Operational overview</div>
+          </div>
+          <div class="actions">
+            <button id="addBtn" class="gold hidden" data-action="add">+ Add record</button>
+          </div>
+        </div>
+        <div id="mainContent"></div>
+      </main>
+    </div>
+  </section>
+
+  <div class="footer">Designed by Alhaji Abu Koroma · FCC Fleet, Fuel &amp; Asset Control · v0.3</div>
+</div>
+
+<input type="file" id="restoreFile" accept=".json,application/json" class="hidden">
+<div id="modalRoot"></div>
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<script>
+/* FCC Fleet, Fuel & Asset Control — v0.3 (single-file edition)
+ * Offline-first: everything is in this file. Data is kept in this browser's localStorage.
+ */
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'fccFleetDB';
+  const BACKUP_PRODUCT = 'FCC Fleet Fuel Asset Control';
+  const BACKUP_VERSION = '0.3';
+  const DEMO_USER = 'admin';
+  const DEMO_PIN = '1234';
+
+  const MODULES = {
+    dashboard:   { label: 'Dashboard', icon: '▦' },
+    vehicles:    { label: 'Fleet Register', icon: '🚘', fields: [
+      ['registration', 'Registration number', 'text', true],
+      ['make', 'Make / model', 'text', true],
+      ['department', 'Department', 'text', true],
+      ['driver', 'Assigned driver', 'text', false],
+      ['mileage', 'Current odometer (km)', 'number', false],
+      ['condition', 'Condition', 'select:Roadworthy,Needs service,Off road', true],
+      ['insurance', 'Insurance / licence expiry', 'date', false],
+      ['notes', 'Notes', 'textarea', false]
+    ]},
+    fuel:        { label: 'Fuel Control', icon: '⛽', fields: [
+      ['date', 'Transaction date', 'date', true],
+      ['vehicle', 'Vehicle registration', 'text', true],
+      ['driver', 'Driver / recipient', 'text', true],
+      ['litres', 'Litres issued', 'number', true],
+      ['price', 'Price per litre (SLE)', 'number', true],
+      ['odometer', 'Odometer at issue (km)', 'number', true],
+      ['supplier', 'Supplier', 'text', false],
+      ['approval', 'Approval reference', 'text', true],
+      ['receipt', 'Receipt / chit reference', 'text', false],
+      ['status', 'Status', 'select:Requested,Approved,Issued,Reconciled,Rejected', true]
+    ]},
+    maintenance: { label: 'Maintenance', icon: '🔧', fields: [
+      ['vehicle', 'Vehicle registration', 'text', true],
+      ['date', 'Service / repair date', 'date', true],
+      ['type', 'Work type', 'select:Routine service,Repair,Tyres,Inspection,Other', true],
+      ['description', 'Work description', 'textarea', true],
+      ['cost', 'Cost (SLE)', 'number', true],
+      ['supplier', 'Workshop / supplier', 'text', false],
+      ['nextDue', 'Next service due (date)', 'date', false],
+      ['status', 'Status', 'select:Open,Approved,In progress,Completed', true]
+    ]},
+    assets:      { label: 'Asset Register', icon: '▣', fields: [
+      ['assetId', 'Asset tag / ID', 'text', true],
+      ['name', 'Asset name', 'text', true],
+      ['category', 'Category', 'select:Vehicle,IT equipment,Tools,Generator,Furniture,Equipment,Other', true],
+      ['department', 'Department / location', 'text', true],
+      ['custodian', 'Responsible custodian', 'text', false],
+      ['condition', 'Condition', 'select:Good,Needs repair,Unserviceable,Missing', true],
+      ['purchaseValue', 'Purchase value (SLE)', 'number', false],
+      ['date', 'Purchase / register date', 'date', false],
+      ['notes', 'Notes', 'textarea', false]
+    ]},
+    stores:      { label: 'Stores & Inventory', icon: '▤', fields: [
+      ['item', 'Item name', 'text', true],
+      ['sku', 'Item / stock code', 'text', true],
+      ['category', 'Category', 'text', false],
+      ['quantity', 'Quantity on hand', 'number', true],
+      ['minimum', 'Reorder level', 'number', true],
+      ['unit', 'Unit', 'text', true],
+      ['location', 'Store location', 'text', false],
+      ['supplier', 'Supplier', 'text', false]
+    ]},
+    requests:    { label: 'Vehicle Requests', icon: '⇄', fields: [
+      ['requester', 'Requesting officer', 'text', true],
+      ['department', 'Department', 'text', true],
+      ['destination', 'Destination / purpose', 'text', true],
+      ['date', 'Date required', 'date', true],
+      ['vehicle', 'Vehicle assigned', 'text', false],
+      ['approvedBy', 'Approver', 'text', false],
+      ['status', 'Status', 'select:Pending,Approved,Declined,Completed', true]
+    ]},
+    suppliers:   { label: 'Suppliers', icon: '♙', fields: [
+      ['name', 'Supplier / workshop name', 'text', true],
+      ['type', 'Service type', 'select:Fuel,Workshop,Parts,General supplies,Other', true],
+      ['contact', 'Contact person', 'text', false],
+      ['phone', 'Phone', 'tel', false],
+      ['email', 'Email', 'email', false],
+      ['address', 'Address', 'text', false],
+      ['status', 'Status', 'select:Active,Under review,Inactive', true]
+    ]},
+    users:       { label: 'Staff Directory', icon: '♟', fields: [
+      ['name', 'Staff name', 'text', true],
+      ['staffId', 'Staff ID', 'text', true],
+      ['department', 'Department', 'text', true],
+      ['role', 'Proposed role', 'select:System Administrator,Fleet Officer,Fuel Officer,Stores Officer,Finance Reviewer,Auditor,Read Only', true],
+      ['status', 'Status', 'select:Active,Suspended', true],
+      ['notes', 'Notes', 'textarea', false]
+    ]}
+  };
+  const DATA_KEYS = Object.keys(MODULES).filter(k => MODULES[k].fields);
+
+  const SEED = {
+    vehicles: [
+      { id: 1, registration: 'FCC-DEMO-001', make: 'Pickup 4x4 (Demo)', department: 'Works', driver: 'Demo Driver A', mileage: 48210, condition: 'Roadworthy', insurance: '2027-03-31', notes: 'Fictional sample record' },
+      { id: 2, registration: 'FCC-DEMO-002', make: 'Utility Van (Demo)', department: 'Sanitation', driver: 'Demo Driver B', mileage: 76300, condition: 'Needs service', insurance: '2026-12-15', notes: 'Fictional sample record' }
+    ],
+    fuel: [
+      { id: 3, date: '2026-10-20', vehicle: 'FCC-DEMO-001', driver: 'Demo Driver A', litres: 35, price: 30, odometer: 48210, supplier: 'Demo Supplier', approval: 'DEMO-APR-001', receipt: 'DEMO-CHIT-001', status: 'Reconciled' },
+      { id: 4, date: '2026-10-20', vehicle: 'FCC-DEMO-002', driver: 'Demo Driver B', litres: 20, price: 30, odometer: 76300, supplier: 'Demo Supplier', approval: 'DEMO-APR-002', receipt: 'DEMO-CHIT-002', status: 'Approved' }
+    ],
+    maintenance: [
+      { id: 5, vehicle: 'FCC-DEMO-002', date: '2026-10-18', type: 'Routine service', description: 'Demo oil and filter service', cost: 850, supplier: 'Demo Workshop', nextDue: '2026-11-18', status: 'Open' }
+    ],
+    assets: [
+      { id: 6, assetId: 'AST-DEMO-001', name: 'Office laptop (Demo)', category: 'IT equipment', department: 'Administration', custodian: 'Demo Custodian', condition: 'Good', purchaseValue: 6500, date: '2026-01-10', notes: 'Fictional sample record' }
+    ],
+    stores: [
+      { id: 7, item: 'Engine oil (Demo)', sku: 'ST-DEMO-001', category: 'Vehicle supplies', quantity: 12, minimum: 5, unit: 'litre', location: 'Demo Store', supplier: 'Demo Supplier' }
+    ],
+    requests: [
+      { id: 8, requester: 'Demo Officer', department: 'Works', destination: 'Routine inspection (demo)', date: '2026-10-22', vehicle: '', approvedBy: '', status: 'Pending' }
+    ],
+    suppliers: [
+      { id: 9, name: 'Demo Supplier Ltd', type: 'Fuel', contact: 'Demo Contact', phone: '000-0000', email: 'demo@example.invalid', address: 'Demo only', status: 'Active' }
+    ],
+    users: [
+      { id: 10, name: 'Demo Administrator', staffId: 'DEMO-ADMIN', department: 'ICT', role: 'System Administrator', status: 'Active', notes: 'Illustrative role only' }
+    ]
+  };
+
+  let db = {};
+  let currentModule = 'dashboard';
+  let toastTimer = null;
+
+  const $ = id => document.getElementById(id);
+  const clone = x => JSON.parse(JSON.stringify(x));
+  const num = v => Number(v) || 0;
+  const money = v => num(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const newId = () => Date.now() * 1000 + Math.floor(Math.random() * 1000);
+  const todayISO = () => new Date().toISOString().slice(0, 10);
+  function daysUntil(dateStr) {
+    if (!dateStr) return null;
+    const t = new Date(dateStr).getTime();
+    if (isNaN(t)) return null;
+    return Math.round((t - new Date(todayISO()).getTime()) / 86400000);
+  }
+  function selectField(k) {
+    return (MODULES[k].fields || []).find(f => f[2].startsWith('select:'));
+  }
+  function filterOptions(k) {
+    const f = selectField(k);
+    return f ? f[2].split(':')[1].split(',') : [];
+  }
+
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.add('hidden'), 3200);
+  }
+
+  function loadDB() {
+    let parsed = null;
+    try { parsed = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) { parsed = null; }
+    db = parsed && typeof parsed === 'object' ? parsed : clone(SEED);
+    DATA_KEYS.forEach(k => { if (!Array.isArray(db[k])) db[k] = []; });
+  }
+  function saveDB() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+      return true;
+    } catch (e) {
+      toast('Could not save on this device (storage may be full). Export a backup now.');
+      return false;
+    }
+  }
+
+  function login(e) {
+    e.preventDefault();
+    const u = $('loginUser').value.trim().toLowerCase();
+    const p = $('loginPin').value;
+    if (u === DEMO_USER && p === DEMO_PIN) {
+      $('loginView').classList.add('hidden');
+      $('appView').classList.remove('hidden');
+      $('logoutBtn').classList.remove('hidden');
+      $('loginPin').value = '';
+      renderNav();
+      showPage('dashboard');
+    } else {
+      toast('Incorrect username or PIN.');
+    }
+  }
+  function logout() {
+    closeModal();
+    $('appView').classList.add('hidden');
+    $('loginView').classList.remove('hidden');
+    $('logoutBtn').classList.add('hidden');
+    currentModule = 'dashboard';
+  }
+
+  function renderNav() {
+    const links = Object.entries(MODULES).map(([k, m]) =>
+      `<button class="navbtn ${k === currentModule ? 'active' : ''}" data-page="${k}">${m.icon} &nbsp; ${esc(m.label)}</button>`
+    ).join('');
+    $('nav').innerHTML = links +
+      `<button class="navbtn ${currentModule === 'sync' ? 'active' : ''}" data-page="sync">⇄ &nbsp; Sync &amp; Setup</button>` +
+      `<button class="navbtn" data-action="export-backup">⇩ &nbsp; Export backup</button>` +
+      `<button class="navbtn" data-action="restore-backup">⇧ &nbsp; Restore backup</button>`;
+  }
+
+  function showPage(k) {
+    currentModule = k;
+    renderNav();
+    const main = $('mainContent');
+    $('addBtn').classList.toggle('hidden', !MODULES[k].fields);
+
+    if (k === 'sync') {
+      $('pageTitle').textContent = 'Sync & Setup';
+      $('pageSub').textContent = 'Device status, backups and production readiness';
+      main.innerHTML = renderSyncPage();
+      updateConnectivity();
+      return;
+    }
+    if (k === 'dashboard') {
+      $('pageTitle').textContent = 'Dashboard';
+      $('pageSub').textContent = 'Operational overview · sample records are fictional';
+      main.innerHTML = renderDashboard();
+      return;
+    }
+
+    $('pageTitle').textContent = MODULES[k].label;
+    $('pageSub').textContent = 'Search, filter, edit and export records';
+    const opts = filterOptions(k).map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    main.innerHTML = `
+      <section class="panel">
+        <div class="toolbar">
+          <input id="searchBox" type="search" placeholder="Search records…" aria-label="Search records">
+          <select id="filterBox" aria-label="Filter by status">
+            <option value="">All statuses / conditions</option>${opts}
+          </select>
+          <button class="secondary" data-action="export-csv">Export CSV</button>
+          <button class="secondary" data-action="print">Print</button>
+        </div>
+        <div id="tableRoot"></div>
+      </section>`;
+    $('searchBox').addEventListener('input', renderTable);
+    $('filterBox').addEventListener('change', renderTable);
+    renderTable();
+  }
+
+  function cellValue(key, v) {
+    if (v === undefined || v === null || v === '') return '<span class="muted">—</span>';
+    if (key === 'status' || key === 'condition') return statusPill(v);
+    if (['price', 'cost', 'purchaseValue'].includes(key)) return 'SLE ' + money(num(v));
+    return esc(v);
+  }
+  function statusPill(v) {
+    const good = ['Roadworthy', 'Reconciled', 'Approved', 'Completed', 'Good', 'Issued', 'Active'];
+    const warn = ['Pending', 'Requested', 'Needs service', 'In progress', 'Needs repair', 'Under review', 'Open'];
+    const bad = ['Off road', 'Rejected', 'Missing', 'Unserviceable', 'Suspended', 'Inactive', 'Declined'];
+    const cls = good.includes(v) ? 'good' : warn.includes(v) ? 'warn' : bad.includes(v) ? 'bad' : '';
+    return `<span class="pill ${cls}">${esc(v)}</span>`;
+  }
+
+  function renderTable() {
+    const root = $('tableRoot');
+    if (!root) return;
+    const k = currentModule;
+    const fields = MODULES[k].fields;
+    const q = ($('searchBox').value || '').trim().toLowerCase();
+    const f = $('filterBox').value;
+    const sel = selectField(k);
+    const rows = db[k].filter(r =>
+      Object.values(r).join(' ').toLowerCase().includes(q) &&
+      (!f || !sel || String(r[sel[0]]) === f)
+    );
+    const body = rows.map(r => `
+      <tr>
+        ${fields.map(x => `<td>${cellValue(x[0], r[x[0]])}</td>`).join('')}
+        <td><div class="actions">
+          <button class="small secondary" data-action="edit" data-id="${esc(r.id)}">Edit</button>
+          <button class="small danger" data-action="delete" data-id="${esc(r.id)}">Delete</button>
+        </div></td>
+      </tr>`).join('');
+    root.innerHTML = `
+      <div class="tablewrap"><table>
+        <thead><tr>${fields.map(x => `<th>${esc(x[1])}</th>`).join('')}<th>Actions</th></tr></thead>
+        <tbody>${body || `<tr><td colspan="${fields.length + 1}" class="empty">No matching records. Use “Add record” to begin.</td></tr>`}</tbody>
+      </table></div>
+      <p class="muted">${rows.length} of ${db[k].length} record(s) shown</p>`;
+  }
+
+  function collectAlerts() {
+    const out = [];
+    db.vehicles.forEach(v => {
+      if (v.condition && v.condition !== 'Roadworthy') out.push({ level: 'warn', text: `${v.registration}: ${v.condition}` });
+      const d = daysUntil(v.insurance);
+      if (d !== null) {
+        if (d < 0) out.push({ level: 'bad', text: `${v.registration}: insurance/licence expired ${-d} day(s) ago` });
+        else if (d <= 60) out.push({ level: 'warn', text: `${v.registration}: insurance/licence expires in ${d} day(s)` });
+      }
+    });
+    db.maintenance.forEach(x => {
+      if (x.status !== 'Completed') out.push({ level: 'bad', text: `Open job: ${x.vehicle} — ${x.type}` });
+      const d = daysUntil(x.nextDue);
+      if (d !== null && d >= 0 && d <= 30) out.push({ level: 'warn', text: `Service due in ${d} day(s): ${x.vehicle}` });
+    });
+    db.stores.forEach(x => {
+      if (num(x.quantity) <= num(x.minimum)) out.push({ level: 'warn', text: `Low stock: ${x.item} (${x.quantity} ${x.unit || ''})` });
+    });
+    db.requests.forEach(x => {
+      if (x.status === 'Pending') out.push({ level: 'warn', text: `Pending vehicle request: ${x.requester} (${x.destination})` });
+    });
+    return out;
+  }
+
+  function renderDashboard() {
+    const total = db.vehicles.length;
+    const road = db.vehicles.filter(x => x.condition === 'Roadworthy').length;
+    const litres = db.fuel.reduce((a, x) => a + num(x.litres), 0);
+    const fuelCost = db.fuel.reduce((a, x) => a + num(x.litres) * num(x.price), 0);
+    const openJobs = db.maintenance.filter(x => x.status !== 'Completed').length;
+    const lowStock = db.stores.filter(x => num(x.quantity) <= num(x.minimum)).length;
+    const latest = db.fuel.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 5);
+    const bar = (label, n) => {
+      const w = total ? Math.round(n / total * 100) : 0;
+      return `<div class="bar-row"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${esc(label)}</span><b>${n}</b></div><div class="bar-track"><div class="bar-fill" style="width:${w}%"></div></div></div>`;
+    };
+    const alerts = collectAlerts();
+    const alertHTML = alerts.length
+      ? alerts.slice(0, 10).map(a => `<p class="alert-line"><span class="pill ${a.level}">${a.level === 'bad' ? 'Action' : 'Check'}</span> &nbsp;${esc(a.text)}</p>`).join('') +
+        (alerts.length > 10 ? `<p class="muted">+ ${alerts.length - 10} more alert(s)</p>` : '')
+      : '<p class="muted">No alerts based on current records.</p>';
+
+    return `
+      <div class="stats">
+        <div class="stat"><div class="label">Registered vehicles</div><div class="num">${total}</div><div class="sub">${road} marked roadworthy</div></div>
+        <div class="stat"><div class="label">Fuel recorded</div><div class="num">${litres.toLocaleString()} L</div><div class="sub">SLE ${money(fuelCost)} recorded value</div></div>
+        <div class="stat"><div class="label">Open maintenance jobs</div><div class="num">${openJobs}</div><div class="sub">Require follow-up</div></div>
+        <div class="stat"><div class="label">Registered assets</div><div class="num">${db.assets.length}</div><div class="sub">${lowStock} stock item(s) at/below reorder level</div></div>
+      </div>
+      <div class="two">
+        <section class="panel"><h3>Fleet condition</h3>
+          ${bar('Roadworthy', road)}${bar('Needs service', db.vehicles.filter(x => x.condition === 'Needs service').length)}${bar('Off road', db.vehicles.filter(x => x.condition === 'Off road').length)}
+          <p class="muted">Keep condition, insurance and mileage records current.</p>
+        </section>
+        <section class="panel"><h3>Control alerts (${alerts.length})</h3>${alertHTML}</section>
+      </div>
+      <section class="panel"><h3>Latest fuel entries</h3>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Date</th><th>Vehicle</th><th>Litres</th><th>Value (SLE)</th><th>Approval</th><th>Status</th></tr></thead>
+          <tbody>${latest.map(x => `<tr><td>${esc(x.date)}</td><td>${esc(x.vehicle)}</td><td>${num(x.litres)}</td><td>${money(num(x.litres) * num(x.price))}</td><td>${esc(x.approval)}</td><td>${statusPill(x.status)}</td></tr>`).join('') || '<tr><td colspan="6" class="empty">No fuel entries yet.</td></tr>'}</tbody>
+        </table></div>
+      </section>
+      <section class="panel"><h3>Quick actions</h3><div class="actions">
+        <button class="secondary" data-page="vehicles">Fleet register</button>
+        <button class="secondary" data-page="fuel">Fuel control</button>
+        <button class="secondary" data-page="maintenance">Maintenance</button>
+        <button class="secondary" data-page="assets">Assets</button>
+        <button class="secondary" data-page="stores">Stores</button>
+      </div></section>`;
+  }
+
+  function renderSyncPage() {
+    return `
+      <div class="two">
+        <section class="panel"><h3>Device and connection</h3>
+          <p id="syncStatusText">${navigator.onLine ? 'This device reports an internet connection.' : 'This device appears offline.'}</p>
+          <p class="muted">Records are saved only in this browser on this device. An internet connection does not mean records are shared with other devices.</p>
+          <div class="actions">
+            <button data-action="refresh-status">Refresh status</button>
+            <button class="secondary" data-action="export-backup">Download JSON backup</button>
+          </div>
+        </section>
+        <section class="panel"><h3>Cloud synchronisation</h3>
+          <div class="helpbox">Multi-device sync needs a hosted database with per-role access rules, staff authentication and a conflict-resolution plan. Never place a service-role key in browser code.</div>
+          <button class="secondary" data-action="check-sync">Check sync configuration</button>
+        </section>
+      </div>
+      <section class="panel"><h3>Backup and restore</h3>
+        <p>Export a JSON backup regularly and keep it somewhere secure. Restoring replaces all records on this device.</p>
+        <div class="actions">
+          <button class="gold" data-action="export-backup">Export full backup</button>
+          <button class="secondary" data-action="restore-backup">Restore backup</button>
+        </div>
+      </section>
+      <section class="panel"><h3>Production readiness checklist</h3><ul>
+        <li>FCC-approved data ownership, retention and access policy</li>
+        <li>Named staff accounts with real authentication (replace the local demo login)</li>
+        <li>Role-based access tests for every role and register</li>
+        <li>Audited approvals for fuel, purchases and asset transfers</li>
+        <li>Conflict handling if records are edited on several devices</li>
+        <li>Encrypted transport, backups and a tested recovery procedure</li>
+        <li>Field pilot, user training and acceptance sign-off</li>
+      </ul></section>`;
+  }
+
+  function fieldHTML(f, value) {
+    const [key, label, type, required] = f;
+    const req = required ? 'required' : '';
+    const star = required ? ' *' : '';
+    const val = value ?? '';
+    const id = `f_${key}`;
+    if (type.startsWith('select:')) {
+      const opts = type.split(':')[1].split(',')
+        .map(o => `<option value="${esc(o)}" ${String(val) === o ? 'selected' : ''}>${esc(o)}</option>`).join('');
+      return `<div class="field"><label for="${id}">${esc(label)}${star}</label><select id="${id}" name="${key}" ${req}><option value="">Choose…</option>${opts}</select></div>`;
+    }
+    if (type === 'textarea') {
+      return `<div class="field wide"><label for="${id}">${esc(label)}${star}</label><textarea id="${id}" name="${key}" ${req}>${esc(val)}</textarea></div>`;
+    }
+    const extra = type === 'number' ? 'min="0" step="any"' : '';
+    return `<div class="field"><label for="${id}">${esc(label)}${star}</label><input id="${id}" name="${key}" type="${type}" value="${esc(val)}" ${extra} ${req}></div>`;
+  }
+
+  function openForm(k, id = null) {
+    if (!MODULES[k] || !MODULES[k].fields) { toast('Open a register first to add a record.'); return; }
+    const existing = id !== null ? db[k].find(x => x.id === id) : null;
+    const r = existing || {};
+    const fields = MODULES[k].fields;
+    $('modalRoot').innerHTML = `
+      <div class="modalback" data-action="backdrop">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+          <div class="modalhead">
+            <h3 id="modalTitle">${id !== null ? 'Edit' : 'Add'} ${esc(MODULES[k].label)} record</h3>
+            <button type="button" class="secondary" data-action="close-modal">Close</button>
+          </div>
+          <form id="recordForm" data-module="${esc(k)}" data-id="${id !== null ? esc(id) : ''}">
+            <div class="row">${fields.map(f => fieldHTML(f, r[f[0]])).join('')}</div>
+            <div class="actions" style="margin-top:16px">
+              <button type="submit" class="gold">Save record</button>
+              <button type="button" class="secondary" data-action="close-modal">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>`;
+    const first = $('modalRoot').querySelector('input,select,textarea');
+    if (first) first.focus();
+  }
+  function closeModal() { $('modalRoot').innerHTML = ''; }
+
+  function validate(k, o, id) {
+    const fields = MODULES[k].fields;
+    const others = db[k].filter(x => x.id !== id);
+    const missing = fields.find(f => f[3] && (o[f[0]] === '' || o[f[0]] === undefined));
+    if (missing) return `${missing[1]} is required.`;
+    const negative = fields.find(f => f[2] === 'number' && o[f[0]] !== '' && o[f[0]] < 0);
+    if (negative) return `${negative[1]} cannot be negative.`;
+    const same = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+    switch (k) {
+      case 'vehicles':
+        if (others.some(x => same(x.registration, o.registration))) return 'That vehicle registration already exists.';
+        break;
+      case 'fuel':
+        if (num(o.litres) <= 0) return 'Litres must be greater than zero.';
+        if (o.receipt && others.some(x => same(x.receipt, o.receipt))) return 'That receipt reference is already recorded. Check existing records.';
+        break;
+      case 'assets':
+        if (others.some(x => same(x.assetId, o.assetId))) return 'That asset tag already exists.';
+        break;
+      case 'stores':
+        if (others.some(x => same(x.sku, o.sku))) return 'That stock code already exists.';
+        break;
+      case 'users':
+        if (others.some(x => same(x.staffId, o.staffId))) return 'That staff ID already exists.';
+        break;
+    }
+    return '';
+  }
+
+  function saveRecord(form) {
+    const k = form.dataset.module;
+    const id = form.dataset.id === '' ? null : Number(form.dataset.id);
+    const fd = new FormData(form);
+    const obj = {};
+    MODULES[k].fields.forEach(f => {
+      const raw = String(fd.get(f[0]) ?? '').trim();
+      obj[f[0]] = f[2] === 'number' ? (raw === '' ? '' : Number(raw)) : raw;
+    });
+    const err = validate(k, obj, id);
+    if (err) { toast(err); return; }
+
+    if (id !== null) {
+      const i = db[k].findIndex(x => x.id === id);
+      if (i >= 0) db[k][i] = { ...db[k][i], ...obj };
+      else db[k].unshift({ ...obj, id });
+    } else {
+      obj.id = newId();
+      db[k].unshift(obj);
+    }
+    if (!saveDB()) return;
+    closeModal();
+    showPage(k);
+    toast('Record saved on this device.');
+  }
+
+  function deleteRow(k, id) {
+    if (!db[k].some(x => x.id === id)) return;
+    if (!confirm('Delete this record from this device? Export a backup first if you may need it.')) return;
+    db[k] = db[k].filter(x => x.id !== id);
+    saveDB();
+    showPage(k);
+    toast('Record deleted.');
+  }
+
+  function downloadBlob(blob, name) {
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function exportBackup() {
+    const payload = { product: BACKUP_PRODUCT, version: BACKUP_VERSION, exportedAt: new Date().toISOString(), data: db };
+    downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
+      `FCC-Fleet-Backup-${todayISO()}.json`);
+    toast('Backup downloaded.');
+  }
+
+  function restoreBackup(e) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try {
+        const parsed = JSON.parse(reader.result);
+        data = parsed && parsed.data ? parsed.data : parsed;
+      } catch (err) {
+        toast('Could not restore: the file is not valid JSON.');
+        return;
+      }
+      if (!data || typeof data !== 'object' || !DATA_KEYS.some(k => Array.isArray(data[k]))) {
+        toast('Could not restore: this is not an FCC backup file.');
+        return;
+      }
+      if (!confirm('Replace all records on this device with the contents of this backup?')) return;
+      const next = {};
+      DATA_KEYS.forEach(k => { next[k] = Array.isArray(data[k]) ? data[k] : []; });
+      db = next;
+      saveDB();
+      showPage(currentModule);
+      toast('Backup restored on this device.');
+    };
+    reader.readAsText(file);
+  }
+
+  function exportCSV(k) {
+    const fields = MODULES[k].fields;
+    const quote = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const lines = [
+      fields.map(f => quote(f[1])).join(','),
+      ...db[k].map(r => fields.map(f => quote(r[f[0]])).join(','))
+    ];
+    downloadBlob(new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }),
+      `FCC-${k}-${todayISO()}.csv`);
+  }
+
+  function updateConnectivity() {
+    const badge = $('connectionBadge');
+    if (badge) {
+      const online = navigator.onLine;
+      badge.innerHTML = `<span class="syncdot ${online ? 'online' : 'offline'}"></span>${online ? 'Online' : 'Offline'}`;
+    }
+    const t = $('syncStatusText');
+    if (t) {
+      t.textContent = navigator.onLine
+        ? 'This device reports an internet connection. Records remain on this device only.'
+        : 'This device appears offline. Recording continues normally on this device.';
+    }
+  }
+
+  function wire() {
+    $('loginForm').addEventListener('submit', login);
+    $('restoreFile').addEventListener('change', restoreBackup);
+
+    document.addEventListener('click', e => {
+      if (e.target.classList && e.target.classList.contains('modalback')) { closeModal(); return; }
+      const t = e.target.closest('[data-page],[data-action]');
+      if (!t) return;
+      if (t.dataset.page) { showPage(t.dataset.page); return; }
+      const id = t.dataset.id !== undefined ? Number(t.dataset.id) : null;
+      switch (t.dataset.action) {
+        case 'add':            openForm(currentModule); break;
+        case 'edit':           openForm(currentModule, id); break;
+        case 'delete':         deleteRow(currentModule, id); break;
+        case 'export-csv':     exportCSV(currentModule); break;
+        case 'export-backup':  exportBackup(); break;
+        case 'restore-backup': $('restoreFile').click(); break;
+        case 'close-modal':    closeModal(); break;
+        case 'print':          window.print(); break;
+        case 'logout':         logout(); break;
+        case 'refresh-status': updateConnectivity(); break;
+        case 'check-sync':     toast('Cloud sync is not configured in this build.'); break;
+      }
+    });
+
+    document.addEventListener('submit', e => {
+      if (e.target && e.target.id === 'recordForm') {
+        e.preventDefault();
+        saveRecord(e.target);
+      }
+    });
+
+    window.addEventListener('online', updateConnectivity);
+    window.addEventListener('offline', updateConnectivity);
+  }
+
+  loadDB();
+  wire();
+  updateConnectivity();
+})();
+</script>
+</body>
+</html>
